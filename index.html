@@ -21,7 +21,6 @@
             --purple-neon: #8a2be2;
             --purple-dark: #240046;
             --purple-glow: rgba(138, 43, 226, 0.4);
-            --dark-matter: #0a0a0f;
             --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             --border-glass: 1px solid rgba(255, 255, 255, 0.03);
         }
@@ -37,116 +36,36 @@
             line-height: 1.7;
         }
 
-        /* Efeito de Terremoto na tela após a explosão */
-        .earthquake-effect {
-            animation: screenShake 0.7s cubic-bezier(.36,.07,.19,.97) 3.6s both;
-        }
-
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
         ::-webkit-scrollbar-thumb { background: var(--purple-neon); border-radius: 4px; }
 
-        /* === ANIMAÇÃO TENEBROSA (SUPER BLASTER V4 - DARK MATTER) === */
+        /* === NOVA ANIMAÇÃO: BOLINHAS JUNTAS EXPLODINDO === */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000; z-index: 99999;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; animation: fadeOutOverlay 0.8s ease 4.2s forwards;
-            flex-direction: column;
+            overflow: hidden; pointer-events: none;
+            transition: opacity 0.5s ease;
         }
 
-        /* O Buraco Negro (Singularidade) */
-        .black-hole {
+        /* Formato de cada bolinha gerada pelo JS */
+        .bolinha {
             position: absolute;
-            width: 200px; height: 200px;
-            background: #000;
             border-radius: 50%;
-            box-shadow: 0 0 50px 10px var(--purple-dark), inset 0 0 20px var(--purple-neon);
-            filter: blur(2px);
-            animation: singularityImplode 3.5s cubic-bezier(0.5, 0, 0.1, 1) forwards;
+            /* A animação tem 3 fases: surge agrupada (cx, cy), pulsa, e explode longe (tx, ty) */
+            animation: clusterExplosion 2.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
         }
 
-        /* Anel de energia caótica rodando em volta */
-        .chaos-ring {
-            position: absolute;
-            width: 250px; height: 250px;
-            border: 2px dashed var(--purple-neon);
-            border-radius: 50%;
-            animation: spinChaos 3s linear infinite, suckIn 3.5s cubic-bezier(0.5, 0, 0.1, 1) forwards;
-        }
-
-        /* Texto Glitch Tenebroso no centro antes de explodir */
-        .glitch-awakening {
-            position: absolute;
-            font-family: 'JetBrains Mono', monospace;
-            color: #fff;
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: 5px;
-            text-shadow: 2px 0 var(--purple-neon), -2px 0 red;
-            opacity: 0;
-            animation: glitchFlash 3.5s steps(1) forwards;
-            z-index: 2;
-        }
-
-        /* Estilhaços Sombrios (Shards) gerados pelo JS */
-        .dark-shard {
-            position: absolute;
-            background: linear-gradient(to top, var(--purple-neon), #000);
-            box-shadow: 0 0 15px var(--purple-neon);
-            /* Um formato de lança/estilhaço */
-            clip-path: polygon(50% 0%, 100% 100%, 50% 85%, 0% 100%);
-            opacity: 0;
-            transform-origin: bottom center;
-            animation: blastShards cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
-        }
-
-        /* Animações Sombrias */
-        @keyframes singularityImplode {
-            0% { transform: scale(1); opacity: 0; }
-            20% { transform: scale(1.5); opacity: 1; box-shadow: 0 0 100px 30px var(--purple-dark); }
-            80% { transform: scale(0.05); box-shadow: 0 0 10px 5px var(--purple-neon); }
-            85% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(0); opacity: 0; display: none; }
-        }
-
-        @keyframes spinChaos {
-            0% { transform: rotate(0deg) scale(1); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        @keyframes suckIn {
-            0% { width: 400px; height: 400px; opacity: 0; }
-            30% { opacity: 1; }
-            80% { width: 10px; height: 10px; opacity: 0; border: 10px solid #fff; }
-            100% { width: 0; height: 0; opacity: 0; }
-        }
-
-        @keyframes glitchFlash {
-            0% { opacity: 0; content: "SYSTEM.SLEEP"; }
-            40% { opacity: 0.8; clip-path: inset(10% 0 50% 0); transform: translate(-5px, 2px); }
-            45% { opacity: 0; }
-            60% { opacity: 1; text-shadow: 5px 0 var(--purple-neon), -5px 0 red; transform: translate(5px, -5px); }
-            65% { opacity: 0; }
-            75% { opacity: 1; text-shadow: -10px 0 #fff; transform: scale(1.2); }
-            80% { opacity: 0; }
-            100% { opacity: 0; }
-        }
-
-        @keyframes blastShards {
-            0% { transform: rotate(var(--rot)) translateY(0) scale(0); opacity: 1; }
-            15% { transform: rotate(var(--rot)) translateY(calc(var(--dist) * -0.2)) scale(1.5); opacity: 1; }
-            100% { transform: rotate(var(--rot)) translateY(calc(var(--dist) * -1)) scale(0); opacity: 0; }
-        }
-
-        @keyframes fadeOutOverlay {
-            to { opacity: 0; visibility: hidden; pointer-events: none; }
-        }
-
-        @keyframes screenShake {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            10%, 30%, 50%, 70%, 90% { transform: translate(-8px, -5px) rotate(-1deg); }
-            20%, 40%, 60%, 80% { transform: translate(8px, 5px) rotate(1deg); }
+        @keyframes clusterExplosion {
+            /* 1. Nascem agrupadas no centro */
+            0% { transform: translate(var(--cx), var(--cy)) scale(0); opacity: 0; }
+            /* 2. Aparecem e ficam juntas no núcleo */
+            15% { transform: translate(var(--cx), var(--cy)) scale(1); opacity: 1; }
+            /* 3. Pulsam levemente antes de estourar */
+            30% { transform: translate(var(--cx), var(--cy)) scale(1.3); opacity: 1; filter: brightness(1.5); }
+            /* 4. O Espalhamento/Explosão total para as pontas da tela */
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
         }
 
         /* === HEADER === */
@@ -188,12 +107,12 @@
             font-size: clamp(2.5rem, 6.5vw, 5rem); font-weight: 800; line-height: 1.1; margin-bottom: 25px;
             background: linear-gradient(to right, #ffffff 40%, var(--purple-light) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            opacity: 0; transform: translateY(30px); animation: fadeUp 1s 4.4s forwards;
+            opacity: 0; transform: translateY(30px); animation: fadeUp 1s 2.2s forwards;
             letter-spacing: -2px;
         }
         .hero p {
             font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: var(--text-muted); max-width: 800px; margin-bottom: 50px;
-            opacity: 0; transform: translateY(30px); animation: fadeUp 1s 4.6s forwards;
+            opacity: 0; transform: translateY(30px); animation: fadeUp 1s 2.4s forwards;
         }
 
         /* Chat Mockup Estendido - Sombrio */
@@ -202,7 +121,7 @@
             border: 1px solid rgba(138,43,226,0.2); border-radius: 16px; padding: clamp(20px, 4vw, 35px);
             box-shadow: 0 40px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
             text-align: left; opacity: 0; transform: translateY(30px) scale(0.95);
-            animation: scaleUp 1s 4.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: scaleUp 1s 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .chat-message { display: flex; gap: 18px; margin-bottom: 30px; font-size: clamp(0.95rem, 1.8vw, 1.05rem); }
         .chat-message:last-child { margin-bottom: 0; }
@@ -260,7 +179,7 @@
             border-radius: 20px; padding: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative;
         }
 
-        /* === FOOTER E TERMOS LEGAIS IMPENETRÁVEIS === */
+        /* === FOOTER E TERMOS LEGAIS === */
         footer { background: #010102; padding: 80px 5% 30px; border-top: 1px solid rgba(138, 43, 226, 0.2); margin-top: 50px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; max-width: 1300px; margin: 0 auto 50px; }
         .footer-brand h3 { color: #fff; font-size: 1.5rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
@@ -278,23 +197,18 @@
         .legal-box p { font-size: 0.75rem; color: #555566; text-align: justify; line-height: 1.8; margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; }
         .legal-box p:last-child { margin-bottom: 0; text-align: center; margin-top: 30px; color: var(--purple-dark); font-size: 0.85rem; }
 
-        /* Utilitários */
+        /* Utilitários Animações CSS */
         .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s ease, transform 0.8s ease; }
         .reveal.active { opacity: 1; transform: translateY(0); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleUp { to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
 </head>
-<body class="earthquake-effect">
+<body>
 
-    <!-- INTRODUÇÃO TENEBROSA (O Colapso) -->
+    <!-- INTRODUÇÃO: BOLINHAS JUNTAS ESPALHANDO (Particle Explosion) -->
     <div id="intro-overlay">
-        <!-- Textos de Glitch que piscam antes de estourar -->
-        <div class="glitch-awakening">VPPE.CORE // AWAKENING</div>
-        <!-- Singularidade (Buraco Negro que suga tudo) -->
-        <div class="chaos-ring"></div>
-        <div class="black-hole"></div>
-        <!-- Estilhaços injetados via JavaScript -->
+        <!-- O JS preencherá isso com bolinhas -->
     </div>
 
     <!-- Header -->
@@ -455,52 +369,64 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
         </div>
     </footer>
 
-    <!-- JavaScript - Explosão Shard Sombria -->
+    <!-- JavaScript - SISTEMA DE EXPLOSÃO DE BOLINHAS -->
     <script>
-        // === 1. SISTEMA DE PARTÍCULAS TENEBROSAS (SHARDS) ===
         window.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('intro-overlay');
-            const numShards = 90; // Quantidade massiva de estilhaços
+            const numBolinhas = 150; // Quantidade alta para um aglomerado denso
 
-            // Atraso de 3.4s para coincidir com o "Glitch" e "SuckIn" do CSS
-            setTimeout(() => {
-                for (let i = 0; i < numShards; i++) {
-                    const shard = document.createElement('div');
-                    shard.classList.add('dark-shard');
-                    
-                    // Shards finos e longos
-                    const width = Math.random() * 4 + 2; 
-                    const height = Math.random() * 80 + 30; 
-                    shard.style.width = `${width}px`;
-                    shard.style.height = `${height}px`;
+            for (let i = 0; i < numBolinhas; i++) {
+                const bolinha = document.createElement('div');
+                bolinha.classList.add('bolinha');
 
-                    // Ângulo de disparo 360 graus
-                    const angle = Math.random() * 360; 
-                    // Distância massiva da explosão (até sair da tela)
-                    const distance = Math.random() * 800 + 300; 
+                // 1. TAMANHO: Varia de 4px a 14px
+                const size = Math.random() * 10 + 4;
+                bolinha.style.width = `${size}px`;
+                bolinha.style.height = `${size}px`;
 
-                    // A rotação do elemento deve apontar para onde ele está indo
-                    // A base do polígono é embaixo, então ele 'voa' para cima, rotacionado pelo ângulo
-                    shard.style.setProperty('--rot', `${angle}deg`);
-                    shard.style.setProperty('--dist', `${distance}px`);
+                // 2. FASE DE AGRUPAMENTO (Juntas no centro)
+                const clusterAngle = Math.random() * 360; 
+                // Raio pequeno (0 a 40px) para nascerem bem juntas parecendo um único núcleo de energia
+                const clusterDist = Math.random() * 40; 
+                const cx = Math.cos(clusterAngle * Math.PI / 180) * clusterDist;
+                const cy = Math.sin(clusterAngle * Math.PI / 180) * clusterDist;
 
-                    // Duração incisiva e agressiva
-                    const duration = 0.5 + Math.random() * 0.8; 
-                    
-                    shard.style.animationDuration = `${duration}s`;
+                // 3. FASE DE EXPLOSÃO (Espalhando)
+                const expAngle = Math.random() * 360; 
+                // Voam para muito longe (entre 300px e 1000px)
+                const expDist = Math.random() * 700 + 300; 
+                const tx = Math.cos(expAngle * Math.PI / 180) * expDist;
+                const ty = Math.sin(expAngle * Math.PI / 180) * expDist;
 
-                    overlay.appendChild(shard);
-                }
-            }, 3400); 
+                // Passa as coordenadas calculadas pelo JS para o CSS
+                bolinha.style.setProperty('--cx', `${cx}px`);
+                bolinha.style.setProperty('--cy', `${cy}px`);
+                bolinha.style.setProperty('--tx', `${tx}px`);
+                bolinha.style.setProperty('--ty', `${ty}px`);
 
-            // Remove o overlay do DOM 
-            setTimeout(() => { overlay.remove(); }, 5000);
-            
-            // Remove o balanço da tela (earthquake) do body para estabilizar o site
-            setTimeout(() => { document.body.classList.remove('earthquake-effect'); }, 4500);
+                // 4. CORES GLOW (Tons vibrantes de Roxo, Neon e Branco)
+                const colors = [
+                    '#8a2be2', // Roxo Neon
+                    '#c792ea', // Roxo Claro
+                    '#ffffff', // Branco
+                    '#240046'  // Roxo Escuro
+                ];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                bolinha.style.background = color;
+                // Adiciona o brilho com a mesma cor
+                bolinha.style.boxShadow = `0 0 15px ${color}, 0 0 30px ${color}`;
+
+                overlay.appendChild(bolinha);
+            }
+
+            // Remove a tela preta depois que as bolinhas espalham
+            setTimeout(() => { 
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.remove(); }, 500); 
+            }, 2500);
         });
 
-        // === 2. SCROLL REVEAL ===
+        // === SCROLL REVEAL (Suavidade ao rolar a página) ===
         const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if(entry.isIntersecting) {
