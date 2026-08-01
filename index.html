@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VPPE AI - A IA para Empresas, Devs, Estudantes e o Dia a Dia</title>
     
+    <!-- FAVICON ADICIONADO -->
+    <link rel="icon" href="https://vppe.cloud/logo.png" type="image/png">
+    
     <!-- Fontes e Ícones -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -26,7 +29,7 @@
         }
 
         /* === RESET & INOVAÇÕES GERAIS === */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; cursor: none; /* Cursor nativo oculto para o customizado */ }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; cursor: none; }
         
         body {
             background-color: var(--bg-dark);
@@ -40,14 +43,12 @@
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
         ::-webkit-scrollbar-thumb { background: var(--purple-neon); border-radius: 4px; }
 
-        /* --- INOVAÇÃO: Scroll Progress Bar --- */
         .scroll-progress {
             position: fixed; top: 0; left: 0; height: 3px; background: var(--purple-neon);
             width: 0%; z-index: 10001; box-shadow: 0 0 10px var(--purple-neon), 0 0 20px var(--purple-light);
             transition: width 0.1s ease-out;
         }
 
-        /* --- INOVAÇÃO: Cursor Customizado --- */
         .cursor-dot {
             position: fixed; width: 6px; height: 6px; background: var(--purple-light); border-radius: 50%;
             pointer-events: none; z-index: 999999; transform: translate(-50%, -50%);
@@ -58,18 +59,34 @@
             pointer-events: none; z-index: 999998; transform: translate(-50%, -50%);
             transition: top 0.15s ease-out, left 0.15s ease-out, width 0.2s, height 0.2s, background-color 0.2s;
         }
-        /* Hover Effect no Cursor */
         .cursor-hover .cursor-outline {
             width: 60px; height: 60px; background-color: rgba(138, 43, 226, 0.1); border-color: var(--purple-neon);
         }
 
         /* =======================================================
-           ANIMAÇÃO DE ENTRADA: NEURAL HYPER-DIVE (Warp Speed)
+           ANIMAÇÃO DE ENTRADA: NEURAL HYPER-DIVE 2.0 (Upgrade)
            ======================================================= */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #010101; z-index: 99999;
             overflow: hidden; pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* INOVAÇÃO NA ANIMAÇÃO: Grid Cibernético de Fundo */
+        .cyber-grid {
+            position: absolute; top: 0; left: 0; width: 200vw; height: 200vh;
+            background: 
+                linear-gradient(transparent 95%, rgba(138,43,226,0.3) 100%), 
+                linear-gradient(90deg, transparent 95%, rgba(138,43,226,0.3) 100%);
+            background-size: 40px 40px;
+            transform: perspective(600px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: gridMove 3s linear infinite; opacity: 0.4;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(600px) rotateX(60deg) translateY(0) translateZ(-200px); }
+            100% { transform: perspective(600px) rotateX(60deg) translateY(40px) translateZ(-200px); }
         }
 
         .core-ring {
@@ -77,79 +94,84 @@
             transform: translate(-50%, -50%);
             border-radius: 50%;
             border: 2px solid transparent;
-            transition: all 0.5s ease;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .r1 { width: 120px; height: 120px; border-top: 2px solid var(--purple-neon); border-bottom: 2px solid var(--purple-light); animation: spin 4s linear infinite; }
-        .r2 { width: 150px; height: 150px; border-left: 2px dashed rgba(138,43,226,0.5); border-right: 2px dashed rgba(138,43,226,0.5); animation: spinReverse 6s linear infinite; }
-        .r3 { width: 180px; height: 180px; border-top: 1px dotted #fff; animation: spin 8s linear infinite; }
+        .r1 { width: 120px; height: 120px; border-top: 2px solid var(--purple-neon); border-bottom: 2px solid var(--purple-light); animation: spin 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; box-shadow: 0 0 20px var(--purple-glow) inset; }
+        .r2 { width: 160px; height: 160px; border-left: 2px dashed rgba(138,43,226,0.8); border-right: 2px dashed rgba(138,43,226,0.8); animation: spinReverse 4s linear infinite; }
+        .r3 { width: 210px; height: 210px; border-top: 2px dotted #fff; border-bottom: 2px dotted var(--purple-neon); animation: spin 6s ease-in-out infinite; opacity: 0.6; }
 
         .core-text {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem; font-weight: 800; letter-spacing: 2px;
-            color: var(--purple-light); text-shadow: 0 0 10px var(--purple-neon);
-            white-space: nowrap; transition: color 0.3s;
+            font-size: 1rem; font-weight: 800; letter-spacing: 3px;
+            color: #fff; text-shadow: 0 0 15px var(--purple-light), 0 0 30px var(--purple-neon);
+            white-space: nowrap; transition: all 0.3s;
+            z-index: 10;
         }
 
         .warp-particle {
             position: absolute; top: 50%; left: 50%;
-            width: 2px; height: 10px;
-            background: var(--purple-light);
+            width: 2px; height: 15px;
+            background: linear-gradient(to bottom, #fff, var(--purple-neon));
             border-radius: 5px;
             transform-origin: top center;
-            animation: floatOut 4s linear infinite;
+            animation: floatOut 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
             animation-delay: var(--delay);
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
-        .earthquake { animation: screenShake 0.4s cubic-bezier(.36,.07,.19,.97) infinite; }
+        .earthquake { animation: screenShake 0.2s cubic-bezier(.36,.07,.19,.97) infinite; }
 
         .flash-bang {
-            position: fixed; inset: 0; background: #fff; z-index: 100000;
-            opacity: 0; pointer-events: none;
+            position: fixed; inset: 0; background: radial-gradient(circle, #fff 20%, var(--purple-light) 100%); z-index: 100000;
+            opacity: 0; pointer-events: none; mix-blend-mode: screen;
         }
-        .flash-bang.trigger { animation: blindingFlash 1.2s ease-out forwards; }
+        .flash-bang.trigger { animation: blindingFlash 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        .warp-mode .core-ring { transform: translate(-50%, -50%) scale(20); opacity: 0; border-color: #fff; }
+        .warp-mode .core-ring { transform: translate(-50%, -50%) scale(25) rotateX(45deg); opacity: 0; border-color: #fff; border-width: 10px; }
         .warp-mode .warp-particle {
             background: #fff;
-            box-shadow: 0 0 15px #fff, 0 0 30px var(--purple-neon);
-            animation: warpJump 0.3s linear infinite;
+            box-shadow: 0 0 20px #fff, 0 0 40px var(--purple-neon);
+            animation: warpJump 0.2s linear infinite;
             animation-delay: var(--delay);
             opacity: 1;
+            height: 50px;
+        }
+        .warp-mode .cyber-grid {
+            animation: gridMove 0.2s linear infinite; opacity: 1;
         }
 
         @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes spinReverse { 0% { transform: translate(-50%, -50%) rotate(360deg); } 100% { transform: translate(-50%, -50%) rotate(0deg); } }
         
         @keyframes floatOut {
-            0% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(40px) scaleY(1); opacity: 0; }
-            20% { opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(800px) scaleY(2); opacity: 0; }
+            0% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(50px) scaleY(1); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(1000px) scaleY(3); opacity: 0; }
         }
 
         @keyframes warpJump {
-            0% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(50px) scaleY(5); opacity: 0; }
+            0% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(60px) scaleY(5); opacity: 0; }
             10% { opacity: 1; }
-            100% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(1500px) scaleY(40); opacity: 1; }
+            100% { transform: translate(-50%, -50%) rotate(var(--angle)) translateY(2000px) scaleY(60); opacity: 1; }
         }
 
         @keyframes screenShake {
             0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(-8px, 5px); }
-            50% { transform: translate(8px, -5px); }
-            75% { transform: translate(-5px, -8px); }
+            25% { transform: translate(-10px, 6px); }
+            50% { transform: translate(10px, -6px); }
+            75% { transform: translate(-6px, -10px); }
         }
 
         @keyframes blindingFlash {
-            0% { opacity: 0; background: #fff; }
-            20% { opacity: 1; background: #fff; box-shadow: 0 0 100px 50px var(--purple-neon) inset; }
-            100% { opacity: 0; display: none; background: transparent; }
+            0% { opacity: 0; background: #fff; transform: scale(1); }
+            20% { opacity: 1; background: #fff; box-shadow: 0 0 150px 100px var(--purple-neon) inset; transform: scale(1.1); }
+            100% { opacity: 0; display: none; background: transparent; transform: scale(1); }
         }
 
         /* =======================================================
-           INTERFACE DO SITE (Luxo, ChatGPT Style, Escuro e Neon)
+           INTERFACE DO SITE 
            ======================================================= */
         
         header {
@@ -158,20 +180,30 @@
             background: rgba(3, 3, 5, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-bottom: 1px solid rgba(138, 43, 226, 0.15);
         }
+        
+        /* ATUALIZAÇÃO DA LOGO: Controle de tela, flexibilidade e imagem */
         .logo {
-            font-size: clamp(1.4rem, 4vw, 1.8rem); font-weight: 800;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; max-width: 65%; /* Controle para não estourar a tela */
+            overflow: hidden;
+        }
+        .logo img {
+            max-height: 45px; max-width: 100%; object-fit: contain; flex-shrink: 0;
+            filter: drop-shadow(0 0 8px rgba(138, 43, 226, 0.4));
+        }
+        .logo span {
+            font-size: clamp(1.2rem, 3.5vw, 1.8rem); font-weight: 800;
             background: linear-gradient(135deg, #fff, var(--purple-light));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         
-        /* --- INOVAÇÃO: Botão com Glitch Hover --- */
         .cta-btn {
             background: linear-gradient(135deg, #000, var(--purple-dark));
             color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none;
             font-weight: 600; font-size: 0.95rem; transition: var(--transition-smooth);
             border: 1px solid var(--purple-neon); box-shadow: 0 4px 20px var(--purple-glow);
-            position: relative; overflow: hidden; z-index: 1;
+            position: relative; overflow: hidden; z-index: 1; flex-shrink: 0;
         }
         .cta-btn::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
@@ -189,6 +221,15 @@
             min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 120px 5% 60px; position: relative;
         }
+        
+        /* ADIÇÃO DE GIF DA INTERNET NO BACKGROUND (Sutil e Profissional) */
+        .hero-gif-bg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100vw; height: 100vh; 
+            background: url('https://media.giphy.com/media/26tn33aiTi1jVDzO0/giphy.gif') center/cover; 
+            opacity: 0.04; z-index: -2; pointer-events: none; mix-blend-mode: screen;
+        }
+
         .hero-glow {
             position: absolute; width: 80vw; height: 80vw; max-width: 900px; max-height: 900px;
             background: radial-gradient(circle, rgba(138,43,226,0.15) 0%, rgba(0,0,0,0) 65%);
@@ -215,11 +256,10 @@
             position: relative; overflow: hidden;
         }
         
-        /* --- INOVAÇÃO: Scanline no Chat Container --- */
         .chat-container::before {
             content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
-            background: linear-gradient(to bottom, transparent, rgba(138, 43, 226, 0.03), transparent);
-            animation: scanline 8s linear infinite; pointer-events: none;
+            background: linear-gradient(to bottom, transparent, rgba(138, 43, 226, 0.05), transparent);
+            animation: scanline 6s linear infinite; pointer-events: none;
         }
 
         @keyframes scanline { 0% { top: -100%; } 100% { top: 100%; } }
@@ -245,7 +285,6 @@
             font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #c792ea; overflow-x: auto;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative;
         }
-        /* --- INOVAÇÃO: Laser no Código --- */
         .code-block::after {
             content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%;
             background: var(--purple-neon); box-shadow: 0 0 10px var(--purple-neon);
@@ -253,21 +292,19 @@
         }
         @keyframes scanCode { 0% { left: 0%; opacity: 0; } 10%, 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
 
-        .audience-section { padding: 100px 5%; max-width: 1300px; margin: 0 auto; perspective: 1000px; }
-        .section-header { text-align: center; margin-bottom: 70px; }
+        .audience-section { padding: 100px 5%; max-width: 1300px; margin: 0 auto; perspective: 1000px; position: relative; }
+        .section-header { text-align: center; margin-bottom: 70px; position: relative; z-index: 2; }
         .section-title { font-size: clamp(2.2rem, 4.5vw, 3.2rem); font-weight: 800; color: #fff; margin-bottom: 20px; }
         .section-title span { color: var(--purple-neon); text-shadow: 0 0 30px var(--purple-glow); }
         .section-desc { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--text-muted); max-width: 700px; margin: 0 auto; }
         
-        .grid-6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .grid-6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; position: relative; z-index: 2; }
         
-        /* --- INOVAÇÃO: 3D Tilt e Efeito Lanterna (Spotlight) via Variáveis CSS --- */
         .feature-card {
             background: var(--bg-panel); border: var(--border-glass); border-radius: 20px; padding: 40px 30px;
             transition: transform 0.1s ease-out, box-shadow 0.3s; position: relative; overflow: hidden; 
             backdrop-filter: blur(10px); transform-style: preserve-3d;
         }
-        /* O Brilho da Lanterna (Spotlight) */
         .feature-card::after {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(138, 43, 226, 0.15), transparent 40%);
@@ -282,7 +319,6 @@
         .feature-card:hover { background: #0a0a0f; box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 20px rgba(138, 43, 226, 0.2); }
         .feature-card:hover::before { opacity: 1; }
         
-        /* Elementos internos ganham profundidade (Z-axis) no Hover */
         .feature-card > * { transform: translateZ(20px); transition: transform 0.3s; position: relative; z-index: 2; }
         
         .feature-icon {
@@ -304,8 +340,17 @@
         
         .visual-content {
             flex: 1; min-width: 300px; background: var(--bg-glass); border: var(--border-glass);
-            border-radius: 20px; padding: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative;
+            border-radius: 20px; padding: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative; overflow: hidden;
         }
+
+        /* ADIÇÃO DE GIF DA INTERNET - Efeito de Rede Neural Integrado */
+        .visual-gif-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; 
+            opacity: 0.15; background: url('https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif') center/cover; 
+            pointer-events: none; mix-blend-mode: screen; filter: grayscale(50%) hue-rotate(250deg);
+        }
+
+        .visual-content > * { position: relative; z-index: 1; }
 
         footer { background: #010102; padding: 80px 5% 30px; border-top: 1px solid rgba(138, 43, 226, 0.2); margin-top: 50px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; max-width: 1300px; margin: 0 auto 50px; }
@@ -322,7 +367,6 @@
             border: 1px solid rgba(138,43,226,0.2); border-radius: 12px; box-shadow: inset 0 0 30px rgba(0,0,0,1);
             position: relative; overflow: hidden;
         }
-        /* --- INOVAÇÃO: Holograma no Legal Box --- */
         .legal-box::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: repeating-linear-gradient(transparent, transparent 2px, rgba(138, 43, 226, 0.05) 3px, transparent 4px);
@@ -333,7 +377,6 @@
         .legal-box p { font-size: 0.75rem; color: #555566; text-align: justify; line-height: 1.8; margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; position: relative; z-index: 2; }
         .legal-box p:last-child { margin-bottom: 0; text-align: center; margin-top: 30px; color: var(--purple-dark); font-size: 0.85rem; }
 
-        /* Utilitários Animações CSS */
         .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
@@ -342,33 +385,33 @@
 </head>
 <body>
 
-    <!-- BARRA DE PROGRESSO E CURSOR CUSTOMIZADO -->
     <div class="scroll-progress" id="scrollProgress"></div>
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
-    <!-- A TELA DO CLARÃO (FLASH BANG) -->
     <div class="flash-bang" id="flashBang"></div>
 
-    <!-- O NÚCLEO E A DOBRA ESPACIAL -->
+    <!-- ANIMAÇÃO DE ENTRADA ATUALIZADA COM GRID -->
     <div id="intro-overlay">
+        <div class="cyber-grid"></div>
         <div class="core-ring r1"></div>
         <div class="core-ring r2"></div>
         <div class="core-ring r3"></div>
         <div class="core-text" id="coreText">[ NEURAL.LINK // INITIATED ]</div>
     </div>
 
-    <!-- Header -->
+    <!-- HEADER ATUALIZADO COM LOGO E CONTROLE DE TELA -->
     <header>
         <a href="https://vppe.cloud" class="logo">
-            <i class="ph-fill ph-cpu" style="color: var(--purple-neon);"></i> VPPE AI
+            <img src="https://vppe.cloud/logo.png" alt="VPPE AI Logo">
+            <span><i class="ph-fill ph-cpu" style="color: var(--purple-neon); margin-right: 5px;"></i>VPPE AI</span>
         </a>
         <a href="https://vppe.cloud" class="cta-btn hover-trigger" target="_blank">Log in or sign up</a>
     </header>
 
-    <!-- Main / Chat -->
     <main>
         <section class="hero">
+            <div class="hero-gif-bg"></div>
             <div class="hero-glow"></div>
             <h1>Poder Absoluto.<br>Inteligência <span>Artificial.</span></h1>
             <p>Construída para quem exige domínio técnico. A VPPE AI não apenas responde; ela reescreve a realidade dos seus sistemas corporativos, projetos de código e rotinas diárias com precisão letal.</p>
@@ -406,7 +449,6 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
             </div>
         </section>
 
-        <!-- Grade Sombria -->
         <section class="audience-section">
             <div class="section-header reveal">
                 <h2 class="section-title">Domine seu <span>Ecossistema.</span></h2>
@@ -447,7 +489,6 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
             </div>
         </section>
 
-        <!-- Deep Dive Escuro -->
         <section class="deep-dive reveal">
             <div class="deep-dive-container">
                 <div class="text-content">
@@ -472,9 +513,13 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
                     </ul>
                 </div>
                 <div class="visual-content hover-trigger" style="transition: transform 0.1s ease-out; transform-style: preserve-3d;">
+                    
+                    <!-- EFEITO GIF DE REDE NEURAL INTEGRADO -->
+                    <div class="visual-gif-overlay"></div>
+
                     <h3 style="color: var(--purple-light); margin-bottom: 20px; transform: translateZ(30px);"><i class="ph ph-code"></i> Lógica em Ação</h3>
                     <p style="color: #fff; margin-bottom: 15px; font-size: 0.95rem; transform: translateZ(20px);"><strong>Prompt:</strong> "Explique recursividade como se eu estivesse em uma situação de sobrevivência."</p>
-                    <div style="background: #000; padding: 20px; border-radius: 8px; border-left: 3px solid red; color: var(--text-muted); font-size: 0.9rem; transform: translateZ(40px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="background: rgba(0,0,0,0.8); padding: 20px; border-radius: 8px; border-left: 3px solid red; color: var(--text-muted); font-size: 0.9rem; transform: translateZ(40px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
                         <strong style="color: #fff;">Resposta (VPPE AI):</strong><br><br>
                         Você está perdido numa caverna escura e precisa achar a saída. Você dá um passo. Se for uma parede, você volta (Condição de Parada). Se for caminho livre, você se chama para dar *mais um passo* a partir dali. A recursividade é você delegar a busca para a "sua versão do futuro", que só volta para te avisar quando bater na parede ou achar a luz.<br><br>
                         <span style="color: #c792ea; font-family: monospace;">def achar_saida(passos):<br>&nbsp;&nbsp;if achou_luz(): return passos<br>&nbsp;&nbsp;if bateu_parede(): return 0<br>&nbsp;&nbsp;return achar_saida(passos + 1)</span>
@@ -484,11 +529,10 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
         </section>
     </main>
 
-    <!-- Footer Impenetrável -->
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
-                <h3><i class="ph-fill ph-skull"></i> VPPE AI</h3>
+                <h3><img src="https://vppe.cloud/logo.png" style="height: 25px; filter: grayscale(1) brightness(2);"> VPPE AI</h3>
                 <p>Construída nas sombras da tecnologia. A IA definitiva para quem não aceita limitações no ambiente digital.</p>
                 <a href="https://vppe.cloud" class="cta-btn hover-trigger" style="display: inline-block; padding: 8px 16px;">Iniciar Protocolo</a>
             </div>
@@ -516,14 +560,12 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
         </div>
     </footer>
 
-    <!-- JavaScript - MÁGICA, ANIMAÇÕES E 3D TILT -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('intro-overlay');
             const coreText = document.getElementById('coreText');
             const flashBang = document.getElementById('flashBang');
             
-            // 1. GERADOR DE PARTÍCULAS RADIAIS (Hyper-Dive Original)
             for (let i = 0; i < 200; i++) {
                 let p = document.createElement('div');
                 p.classList.add('warp-particle');
@@ -553,7 +595,6 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
                 }, 200);
             }, 3600);
 
-            // --- INOVAÇÃO: Lógica do Cursor Customizado ---
             const cursorDot = document.querySelector('.cursor-dot');
             const cursorOutline = document.querySelector('.cursor-outline');
             
@@ -564,20 +605,17 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
                 cursorDot.style.left = `${posX}px`;
                 cursorDot.style.top = `${posY}px`;
                 
-                // Animação de "atraso" pro outline
                 cursorOutline.animate({
                     left: `${posX}px`,
                     top: `${posY}px`
                 }, { duration: 150, fill: "forwards" });
             });
 
-            // Hover state pro cursor em elementos clicáveis/importantes
             document.querySelectorAll('a, .hover-trigger').forEach(el => {
                 el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
                 el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
             });
 
-            // --- INOVAÇÃO: Scroll Progress Bar ---
             window.addEventListener('scroll', () => {
                 const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
                 const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -585,7 +623,6 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
                 document.getElementById('scrollProgress').style.width = scrolled + "%";
             });
 
-            // --- INOVAÇÃO: Tilt 3D + Efeito Lanterna (Spotlight) nos Cards ---
             const cards = document.querySelectorAll('.feature-card, .visual-content');
             
             cards.forEach(card => {
@@ -594,14 +631,12 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
 
-                    // Spotlight de variáveis CSS
                     card.style.setProperty('--mouse-x', `${x}px`);
                     card.style.setProperty('--mouse-y', `${y}px`);
 
-                    // Tilt 3D
                     const centerX = rect.width / 2;
                     const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -10; // Força do Tilt
+                    const rotateX = ((y - centerY) / centerY) * -10; 
                     const rotateY = ((x - centerX) / centerX) * 10;
                     
                     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
@@ -613,7 +648,6 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
             });
         });
 
-        // === SCROLL REVEAL (Original Mantido) ===
         const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if(entry.isIntersecting) {
