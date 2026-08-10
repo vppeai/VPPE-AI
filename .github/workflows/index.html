@@ -841,8 +841,7 @@
             if (typeof marked !== 'undefined') {
                 contentHTML = marked.parse(text);
             } else {
-                contentHTML = `<p>${escapeHTML(text).replace(/
-/g, '<br>')}</p>`;
+                contentHTML = `<p>${escapeHTML(text).replace(/\\n/g, '<br>')}</p>`;
             }
 
             messageDiv.innerHTML = `
