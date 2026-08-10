@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VPPE AI - A IA para Empresas, Devs, Estudantes e o Dia a Dia</title>
+    <title>VPPE AI - O Seu Assistente Pessoal para Estudos e Dia a Dia</title>
     
     <link rel="icon" href="https://vppe.cloud/logo.png" type="image/png">
     
@@ -12,6 +12,8 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Three.js para os Modelos 3D Reais -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <!-- Marked.js para renderizar Markdown no chat (Opcional, mas melhora a formatação) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         /* === VARIÁVEIS MASTER === */
@@ -243,7 +245,7 @@
             text-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
 
-        /* --- CHATGPT STYLE CONTAINER --- */
+        /* --- CHATGPT STYLE LIVE CHAT CONTAINER --- */
         .chat-container {
             width: 100%; max-width: 850px; background: transparent; 
             text-align: left; opacity: 0; transform: translateY(30px) scale(0.98);
@@ -251,6 +253,13 @@
             position: relative; border-radius: 12px; overflow: hidden;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+            background: var(--bg-chat-user);
+        }
+
+        .chat-messages {
+            max-height: 450px; overflow-y: auto; display: flex; flex-direction: column;
+            scroll-behavior: smooth;
         }
 
         .chat-message { 
@@ -272,29 +281,47 @@
             width: 24px; height: 24px; object-fit: contain;
         }
 
-        .message-content { flex: 1; padding-top: 2px; }
+        .message-content { flex: 1; padding-top: 2px; overflow: hidden; }
         .message-header { font-weight: 600; margin-bottom: 8px; color: #fff; font-size: 1rem; }
+        .message-content p { margin-bottom: 10px; }
+        .message-content p:last-child { margin-bottom: 0; }
         
-        /* CHATGPT STYLE CODE BLOCK */
-        .code-block-wrapper {
-            margin-top: 20px; border-radius: 8px; overflow: hidden;
-            background: #000; border: 1px solid #333;
+        /* CHAT INPUT AREA */
+        .chat-input-area {
+            display: flex; gap: 10px; padding: 20px 30px; background: var(--bg-chat-ai);
+            border-top: 1px solid rgba(255,255,255,0.05); align-items: flex-end;
         }
-        .code-block-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 16px; background: #2f2f2f; color: #b4b4b4; font-size: 0.8rem;
-            font-family: 'Inter', sans-serif;
+        .chat-input-area textarea {
+            flex: 1; background: var(--bg-chat-user); border: 1px solid rgba(255,255,255,0.1);
+            color: #ececec; border-radius: 12px; padding: 14px 18px; font-family: 'Inter', sans-serif;
+            font-size: 1rem; resize: none; min-height: 52px; max-height: 200px; outline: none;
+            transition: border 0.3s, box-shadow 0.3s; line-height: 1.5;
         }
-        .code-block-header button {
-            background: none; border: none; color: #b4b4b4; cursor: none; display: flex; align-items: center; gap: 5px; font-size: 0.8rem;
+        .chat-input-area textarea:focus { 
+            border-color: rgba(255,255,255,0.3); box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        .code-block {
-            padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #ececec; overflow-x: auto;
+        .chat-input-area button {
+            background: #fff; color: #000; border: none; width: 52px; height: 52px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; cursor: none; transition: transform 0.2s, background 0.2s;
+            flex-shrink: 0;
         }
-        .code-keyword { color: #c792ea; }
-        .code-string { color: #a3be8c; }
-        .code-comment { color: #6272a4; }
+        .chat-input-area button:hover { transform: scale(1.05); background: #ececec; }
+        .chat-input-area button:disabled { background: #555; color: #888; transform: none; cursor: default; }
 
+        /* LOADING INDICATOR */
+        .typing-indicator {
+            display: flex; gap: 5px; align-items: center; padding: 10px 0;
+        }
+        .typing-indicator span {
+            width: 6px; height: 6px; background: #888; border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* MUDANÇA NO PÚBLICO - AUDIENCE SECTION */
         .audience-section { padding: 100px 5%; max-width: 1200px; margin: 0 auto; perspective: 1000px; position: relative; }
         .section-header { text-align: center; margin-bottom: 70px; position: relative; z-index: 2; }
         .section-title { font-size: clamp(2.2rem, 4vw, 3rem); font-weight: 700; color: #fff; margin-bottom: 20px; letter-spacing: -1px; }
@@ -384,94 +411,73 @@
             <img src="https://vppe.cloud/logo.png" alt="VPPE AI Logo">
             <span>VPPE AI</span>
         </a>
-        <a href="https://vppe.cloud" class="cta-btn hover-trigger" target="_blank">Try VPPE AI <i class="ph-bold ph-arrow-up-right"></i></a>
+        <a href="https://vppe.cloud" class="cta-btn hover-trigger" target="_blank">Entrar na VPPE AI <i class="ph-bold ph-arrow-up-right"></i></a>
     </header>
 
     <main>
         <section class="hero">
-            <h1>Otimização.<br>Inteligência <span>Artificial.</span></h1>
-            <p>Construída para quem exige domínio técnico. A VPPE AI não apenas responde; ela otimiza sistemas corporativos, projetos de código e rotinas com precisão de máquina.</p>
+            <h1>Inteligência.<br>Aprendizado. <span>Dia a Dia.</span></h1>
+            <p>Feita para estudantes, jovens e mentes curiosas. A VPPE AI é a sua assistente pessoal definitiva para resolver dúvidas, criar textos, planejar sua rotina e facilitar a sua vida.</p>
             
-            <div class="chat-container hover-trigger">
-                <!-- User Message -->
-                <div class="chat-message user">
-                    <div class="avatar user">D</div>
-                    <div class="message-content">
-                        <div class="message-header">You</div>
-                        Injete um protocolo de segurança nível bancário no meu microsserviço Node.js e traduza o impacto disso para o board executivo.
-                    </div>
-                </div>
-                <!-- AI Message -->
-                <div class="chat-message ai">
-                    <div class="avatar ai"><img src="https://vppe.cloud/logo.png" alt="AI"></div>
-                    <div class="message-content">
-                        <div class="message-header">VPPE AI</div>
-                        <p><strong>Para os Executivos:</strong> "Acabamos de isolar nossos dados em um cofre digital hermético. Interceptações externas agora são matematicamente quase impossíveis, mitigando drasticamente os riscos de vazamento neste fluxo."</p>
-                        
-                        <p style="margin-top: 15px;">Aqui está a implementação do Zero-Trust Protocol para a conexão do seu banco de dados:</p>
-                        
-                        <!-- CHATGPT STYLE CODE BLOCK -->
-                        <div class="code-block-wrapper hover-trigger">
-                            <div class="code-block-header">
-                                <span>javascript</span>
-                                <button><i class="ph ph-copy"></i> Copy code</button>
-                            </div>
-                            <div class="code-block">
-<span class="code-comment">// Node.js Vault Connection (VPPE Zero-Trust Protocol)</span>
-<span class="code-keyword">const</span> { Client } = <span class="code-keyword">require</span>(<span class="code-string">'pg'</span>);
-<span class="code-keyword">const</span> client = <span class="code-keyword">new</span> Client({
-    host: process.env.DB_HOST,
-    ssl: { 
-        rejectUnauthorized: <span class="code-keyword">true</span>, 
-        ca: process.env.CA_CERT_VAULT,
-        ciphers: <span class="code-string">'TLS_AES_256_GCM_SHA384'</span>
-    }
-});
-<span class="code-keyword">await</span> client.connect();
-console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."</span>);
-                            </div>
+            <!-- CHAT INTERATIVO E FUNCIONAL COM API -->
+            <div class="chat-container hover-trigger" id="interactiveChat">
+                
+                <div class="chat-messages" id="chatBox">
+                    <!-- Mensagem Inicial da IA -->
+                    <div class="chat-message ai">
+                        <div class="avatar ai"><img src="https://vppe.cloud/logo.png" alt="AI"></div>
+                        <div class="message-content">
+                            <div class="message-header">VPPE AI</div>
+                            <p>Olá! Sou a VPPE AI. Estou aqui para ajudar nos seus estudos, trabalhos escolares, planejamento diário ou responder a qualquer dúvida que você tenha. O que vamos aprender hoje?</p>
                         </div>
                     </div>
                 </div>
+
+                <!-- Input Field -->
+                <div class="chat-input-area">
+                    <textarea id="userInput" placeholder="Envie uma mensagem para a VPPE AI..." rows="1"></textarea>
+                    <button id="sendBtn"><i class="ph-bold ph-arrow-up"></i></button>
+                </div>
+
             </div>
         </section>
 
         <section class="audience-section">
             <div class="section-header reveal">
-                <h2 class="section-title">Domine seu Ecossistema.</h2>
-                <p class="section-desc">Adaptabilidade brutal. A VPPE AI mapeia a complexidade do seu ambiente e age como um arquiteto mestre em qualquer disciplina.</p>
+                <h2 class="section-title">Domine seus Estudos e Rotina.</h2>
+                <p class="section-desc">Adaptabilidade incrível. A VPPE AI entende o que você precisa e funciona como sua tutora e assistente pessoal 24 horas por dia.</p>
             </div>
 
             <div class="grid-6">
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.1s;">
-                    <div class="feature-icon"><i class="ph-light ph-buildings"></i></div>
-                    <h3>Impérios Corporativos</h3>
-                    <p>Construa APIs impenetráveis. Automatize processos B2B em massa, analise fluxos de caixa em milissegundos e mantenha sigilo corporativo.</p>
+                    <div class="feature-icon"><i class="ph-light ph-student"></i></div>
+                    <h3>Para Estudantes</h3>
+                    <p>Resuma textos complexos, resolva equações, entenda física e história de forma simples e direta para arrasar nas provas.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.2s;">
-                    <div class="feature-icon"><i class="ph-light ph-terminal-window"></i></div>
-                    <h3>Engenharia de Software</h3>
-                    <p>Código limpo, arquitetura escalável e segurança por padrão. Peça refatorações completas ou debug de sistemas legados.</p>
+                    <div class="feature-icon"><i class="ph-light ph-pencil-line"></i></div>
+                    <h3>Redações & Trabalhos</h3>
+                    <p>Gere ideias, organize a estrutura de uma redação nota 1000 e corrija a gramática dos seus trabalhos escolares.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.3s;">
-                    <div class="feature-icon"><i class="ph-light ph-student"></i></div>
-                    <h3>Estudantes de Elite</h3>
-                    <p>Esmague curvas de aprendizado. Desmembre teorias quânticas, cálculos avançados e filosofias densas em mapas mentais.</p>
+                    <div class="feature-icon"><i class="ph-light ph-calendar-check"></i></div>
+                    <h3>Organização Diária</h3>
+                    <p>Crie cronogramas de estudo, organize sua rotina financeira, planeje viagens e otimize o seu tempo com inteligência.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.4s;">
-                    <div class="feature-icon"><i class="ph-light ph-chalkboard-teacher"></i></div>
-                    <h3>Mestres e Professores</h3>
-                    <p>Automatize a burocracia acadêmica. Gere matrizes de avaliação complexas e planos de aula dinâmicos instantaneamente.</p>
+                    <div class="feature-icon"><i class="ph-light ph-translate"></i></div>
+                    <h3>Aprenda Idiomas</h3>
+                    <p>Pratique conversação em inglês ou espanhol, traduza textos perfeitamente e tire dúvidas de vocabulário na hora.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.5s;">
-                    <div class="feature-icon"><i class="ph-light ph-fingerprint"></i></div>
-                    <h3>Rotina Implacável</h3>
-                    <p>Otimização de vida. Transforme a IA no seu estrategista. Gestão de finanças e rotinas hiper-personalizadas.</p>
+                    <div class="feature-icon"><i class="ph-light ph-lightbulb"></i></div>
+                    <h3>Curiosidade Jovem</h3>
+                    <p>Tem dúvidas sobre tecnologia, universo, cultura pop ou dicas de livros? A IA responde a tudo de forma dinâmica e moderna.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.6s;">
-                    <div class="feature-icon"><i class="ph-light ph-pen-nib"></i></div>
-                    <h3>Criação e Domínio</h3>
-                    <p>Gere textos que convertem, copy persuasiva, roteiros magnéticos e artigos ranqueados para SEO com maestria.</p>
+                    <div class="feature-icon"><i class="ph-light ph-code"></i></div>
+                    <h3>Primeiros Passos na Web</h3>
+                    <p>Se interessou por tecnologia? Peça para ela te ensinar conceitos básicos de programação, web e desenvolvimento de forma amigável.</p>
                 </div>
             </div>
         </section>
@@ -479,34 +485,33 @@ console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."
         <section class="deep-dive reveal">
             <div class="deep-dive-container">
                 <div class="text-content">
-                    <h2>Força Computacional Bruta.</h2>
-                    <p>Nós abandonamos as respostas genéricas. A VPPE AI possui uma base contextual que não apenas gera palavras, mas infere intenções subjacentes, comportando-se de forma analítica.</p>
+                    <h2>Companhia Inteligente.</h2>
+                    <p>A VPPE AI não dá apenas respostas curtas. Ela analisa o contexto da sua dúvida e explica pacientemente até você entender de verdade, como o melhor professor que você já teve.</p>
                     
                     <ul>
                         <li class="hover-trigger">
                             <i class="ph-light ph-brain"></i>
                             <div>
-                                <strong>Memória de Fio Condutor</strong><br>
-                                <span style="color: var(--text-muted); font-size: 0.95rem;">Lógica persistente. Ela retém a arquitetura do contexto fornecido na sessão.</span>
+                                <strong>Memória Interativa</strong><br>
+                                <span style="color: var(--text-muted); font-size: 0.95rem;">Lógica persistente. Ela lembra do que você perguntou antes para manter o fio da meada.</span>
                             </div>
                         </li>
                         <li class="hover-trigger">
                             <i class="ph-light ph-shield-check"></i>
                             <div>
                                 <strong>Privacidade por Padrão</strong><br>
-                                <span style="color: var(--text-muted); font-size: 0.95rem;">Controle absoluto. O que você processa no seu ambiente de trabalho permanece privado.</span>
+                                <span style="color: var(--text-muted); font-size: 0.95rem;">O que você compartilha em conversas e estudos fica seguro na sua sessão.</span>
                             </div>
                         </li>
                     </ul>
                 </div>
                 <div class="visual-content hover-trigger" style="transition: transform 0.1s ease-out;">
-                    <h3 style="color: #fff; margin-bottom: 20px; font-weight: 600;"><i class="ph ph-code"></i> Lógica em Ação</h3>
-                    <p style="color: #ececec; margin-bottom: 15px; font-size: 0.95rem;"><strong>Prompt:</strong> "Explique recursividade como se eu estivesse em uma situação de sobrevivência."</p>
+                    <h3 style="color: #fff; margin-bottom: 20px; font-weight: 600;"><i class="ph ph-chat-text"></i> Interação Natural</h3>
+                    <p style="color: #ececec; margin-bottom: 15px; font-size: 0.95rem;"><strong>Você:</strong> "Me explica como funciona um buraco negro de um jeito muito simples?"</p>
                     
                     <div style="background: #212121; padding: 20px; border-radius: 8px; border-left: 3px solid #10a37f; color: var(--text-muted); font-size: 0.9rem;">
                         <strong style="color: #fff;">VPPE AI</strong><br><br>
-                        Você está perdido numa caverna escura e precisa achar a saída. Você dá um passo. Se for uma parede, você volta (Condição de Parada). Se for caminho livre, você se chama para dar *mais um passo* a partir dali. A recursividade é você delegar a busca para a "sua versão do futuro".<br><br>
-                        <span style="color: #ececec; font-family: monospace;">def achar_saida(passos):<br>&nbsp;&nbsp;if achou_luz(): return passos<br>&nbsp;&nbsp;if bateu_parede(): return 0<br>&nbsp;&nbsp;return achar_saida(passos + 1)</span>
+                        Claro! Imagina que você pegou a Terra inteira e esmagou até ela ficar do tamanho de uma bolinha de gude. <br><br>Ela ficaria tão pesada e densa que a gravidade dela iria puxar tudo ao redor com uma força gigante, como um super aspirador de pó invisível no espaço. Essa força é tão grande que nem a luz consegue escapar de ser sugada. E é por isso que ele é "negro"!
                     </div>
                 </div>
             </div>
@@ -517,28 +522,28 @@ console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."
         <div class="footer-grid">
             <div class="footer-brand">
                 <h3><img src="https://vppe.cloud/logo.png" style="height: 24px; filter: grayscale(1) brightness(2);"> VPPE AI</h3>
-                <p>A IA definitiva para quem não aceita limitações no ambiente digital. Produtividade levada ao limite.</p>
+                <p>A inteligência artificial pensada para empoderar mentes criativas, jovens e curiosas diariamente.</p>
             </div>
             <div class="footer-links">
-                <h4>Matriz</h4>
+                <h4>Navegação</h4>
                 <ul>
-                    <li><a href="https://vppe.cloud" class="hover-trigger">Central de Comando</a></li>
-                    <li><a href="https://vppe.cloud" class="hover-trigger">Documentação API</a></li>
-                    <li><a href="https://vppe.cloud" class="hover-trigger">Acesso Corporativo</a></li>
+                    <li><a href="https://vppe.cloud" class="hover-trigger">Acessar Plataforma</a></li>
+                    <li><a href="https://vppe.cloud" class="hover-trigger">Dicas de Estudo</a></li>
+                    <li><a href="https://vppe.cloud" class="hover-trigger">Planos e Preços</a></li>
                 </ul>
             </div>
             <div class="footer-links">
-                <h4>Protocolos Legais</h4>
+                <h4>Legal</h4>
                 <ul>
                     <li><a href="#" class="hover-trigger">Termos de Uso</a></li>
                     <li><a href="#" class="hover-trigger">Política de Privacidade</a></li>
-                    <li><a href="#" class="hover-trigger">Conformidade</a></li>
+                    <li><a href="#" class="hover-trigger">Diretrizes da Comunidade</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="legal-box hover-trigger">
-            <p>Os códigos-fonte, rotinas algorítmicas, layout e respostas processadas estão sujeitos aos termos de licenciamento da VPPE AI e seus parceiros. Qualquer tentativa de engenharia reversa de endpoints ou uso não autorizado poderá resultar em medidas cabíveis sob as diretrizes de Propriedade Intelectual.</p>
+            <p>Todo o processamento e tecnologia por trás deste chat estão sujeitos aos termos da VPPE AI e seus parceiros. Não utilize ferramentas de IA para trapacear, mas sim para aprender e acelerar o seu conhecimento de forma construtiva e ética.</p>
             <p>&copy; 2026 VPPE AI PARTNER. TODOS OS DIREITOS RESERVADOS.</p>
         </div>
     </footer>
@@ -561,7 +566,7 @@ console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
-            // Criando as Partículas (Rede Neural / Espaço)
+            // Criando as Partículas
             const particlesGeometry = new THREE.BufferGeometry();
             const particlesCount = 1500;
             const posArray = new Float32Array(particlesCount * 3);
@@ -583,7 +588,6 @@ console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."
             const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particlesMesh);
 
-            // Interação suave com o mouse
             let mouseX = 0;
             let mouseY = 0;
             window.addEventListener('mousemove', (e) => {
@@ -591,24 +595,20 @@ console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."
                 mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
             });
 
-            // Responsividade
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
 
-            // Loop de Animação
             const clock = new THREE.Clock();
             const animate3D = () => {
                 requestAnimationFrame(animate3D);
                 const elapsedTime = clock.getElapsedTime();
 
-                // Rotação suave da malha inteira
                 particlesMesh.rotation.y = elapsedTime * 0.05;
                 particlesMesh.rotation.x = elapsedTime * 0.02;
 
-                // Parallax sutil com o mouse
                 camera.position.x += (mouseX * 5 - camera.position.x) * 0.02;
                 camera.position.y += (mouseY * 5 - camera.position.y) * 0.02;
                 camera.lookAt(scene.position);
@@ -618,11 +618,10 @@ console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."
             animate3D();
         };
 
-        // Inicia o 3D
         init3DBackground();
 
         // ==========================================
-        // 2. SCRIPTS DE INTERAÇÃO EXISTENTES
+        // 2. SCRIPTS DE INTERAÇÃO E ANIMAÇÃO
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('intro-overlay');
@@ -710,6 +709,190 @@ console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."
         }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+
+        // ==========================================
+        // 3. LÓGICA DO CHAT FUNCIONAL E INTEGRAÇÃO API
+        // ==========================================
+        const API_ENDPOINT = "https://vppe.cloud/api.php/v1/chat/completions";
+        // A API Key está incluída no client-side como requisitado de forma furtiva
+        const SECRET_KEY = "vppe_1c0fa148546f95c73475850d10b9a65d482218cbabb10b11";
+
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Histórico do Chat para manter o contexto
+        let conversationHistory = [
+            {
+                role: "system",
+                content: "Você é a VPPE AI, uma inteligência artificial amigável, inteligente e prestativa. O seu foco é ajudar estudantes, jovens e auxiliar nas tarefas do dia a dia. Você dá respostas claras, criativas, formatadas usando markdown quando necessário e usa uma linguagem acessível e acolhedora. Responda em português."
+            }
+        ];
+
+        // Ajustar altura do textarea dinamicamente
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight < 200 ? this.scrollHeight : 200) + 'px';
+        });
+
+        // Evento de tecla Enter
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', handleSendMessage);
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        async function handleSendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // 1. Adicionar mensagem do usuário na tela
+            appendMessage('user', message);
+            userInput.value = '';
+            userInput.style.height = '52px';
+            sendBtn.disabled = true;
+
+            // Atualizar contexto
+            conversationHistory.push({ role: "user", content: message });
+
+            // 2. Mostrar indicador de carregamento
+            const loadingId = appendLoading();
+
+            try {
+                // 3. Fazer chamada à API
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SECRET_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo", // Ajuste o modelo caso a API requeira um diferente
+                        messages: conversationHistory,
+                        max_tokens: 800,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Remover o loading
+                removeLoading(loadingId);
+
+                if (data.choices && data.choices.length > 0) {
+                    const aiReply = data.choices[0].message.content;
+                    
+                    // Adicionar ao histórico
+                    conversationHistory.push({ role: "assistant", content: aiReply });
+                    
+                    // Renderizar na tela (com Marked.js caso queira suporte avançado a Markdown, se disponível, ou formatação básica)
+                    appendMessage('ai', aiReply);
+                } else {
+                    throw new Error("Resposta inválida da API.");
+                }
+
+            } catch (error) {
+                console.error("Erro na API da VPPE:", error);
+                removeLoading(loadingId);
+                appendMessage('ai', "Desculpe, tive um probleminha técnico no momento. Pode tentar de novo em instantes? 🤖🛠️");
+            } finally {
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', sender);
+            
+            let avatarHTML = '';
+            let headerHTML = '';
+
+            if (sender === 'user') {
+                avatarHTML = `<div class="avatar user">Você</div>`;
+                headerHTML = `<div class="message-header">You</div>`;
+            } else {
+                avatarHTML = `<div class="avatar ai"><img src="https://vppe.cloud/logo.png" alt="AI"></div>`;
+                headerHTML = `<div class="message-header">VPPE AI</div>`;
+            }
+
+            // Usando Marked se existir, senão quebra de linha simples
+            let contentHTML = '';
+            if (typeof marked !== 'undefined') {
+                contentHTML = marked.parse(text);
+            } else {
+                contentHTML = `<p>${escapeHTML(text).replace(/
+/g, '<br>')}</p>`;
+            }
+
+            messageDiv.innerHTML = `
+                ${avatarHTML}
+                <div class="message-content">
+                    ${headerHTML}
+                    ${contentHTML}
+                </div>
+            `;
+
+            chatBox.appendChild(messageDiv);
+            scrollToBottom();
+
+            // Adicionar cursor hover nos novos links ou blocos de código gerados pelo marked
+            messageDiv.querySelectorAll('a, button').forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+        }
+
+        function appendLoading() {
+            const id = 'loading-' + Date.now();
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', 'ai');
+            messageDiv.id = id;
+
+            messageDiv.innerHTML = `
+                <div class="avatar ai"><img src="https://vppe.cloud/logo.png" alt="AI"></div>
+                <div class="message-content">
+                    <div class="message-header">VPPE AI</div>
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+
+            chatBox.appendChild(messageDiv);
+            scrollToBottom();
+            return id;
+        }
+
+        function removeLoading(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
     </script>
 </body>
 </html>
