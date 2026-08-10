@@ -5,27 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VPPE AI - A IA para Empresas, Devs, Estudantes e o Dia a Dia</title>
     
-    <!-- FAVICON ADICIONADO -->
     <link rel="icon" href="https://vppe.cloud/logo.png" type="image/png">
     
     <!-- Fontes e Ícones -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Three.js para os Modelos 3D Reais -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 
     <style>
         /* === VARIÁVEIS MASTER === */
         :root {
-            --bg-dark: #030305;
-            --bg-panel: rgba(12, 12, 18, 0.7);
-            --bg-glass: rgba(18, 18, 25, 0.4);
-            --text-main: #f3f3f7;
-            --text-muted: #8e8ea5;
+            /* Fundo estilo ChatGPT (Escuro Metálico/Neutro) */
+            --bg-dark: #212121; 
+            --bg-chat-user: #212121;
+            --bg-chat-ai: #2f2f2f;
+            --bg-panel: #2f2f2f;
+            
+            --text-main: #ececec;
+            --text-muted: #b4b4b4;
             --purple-light: #c792ea;
             --purple-neon: #8a2be2;
             --purple-dark: #240046;
             --purple-glow: rgba(138, 43, 226, 0.4);
             --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            --border-glass: 1px solid rgba(255, 255, 255, 0.03);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         /* === RESET & INOVAÇÕES GERAIS === */
@@ -34,14 +38,26 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow-x: hidden;
             line-height: 1.7;
         }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--purple-neon); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* CONTAINER 3D NO FUNDO */
+        #bg-3d-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
 
         .scroll-progress {
             position: fixed; top: 0; left: 0; height: 3px; background: var(--purple-neon);
@@ -64,7 +80,7 @@
         }
 
         /* =======================================================
-           ANIMAÇÃO DE ENTRADA: NEURAL HYPER-DIVE 2.0 (Upgrade)
+           ANIMAÇÃO DE ENTRADA: NEURAL HYPER-DIVE 2.0
            ======================================================= */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -73,7 +89,6 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* INOVAÇÃO NA ANIMAÇÃO: Grid Cibernético de Fundo */
         .cyber-grid {
             position: absolute; top: 0; left: 0; width: 200vw; height: 200vh;
             background: 
@@ -177,207 +192,169 @@
         header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
-            background: rgba(3, 3, 5, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(138, 43, 226, 0.15);
+            background: rgba(33, 33, 33, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         
-        /* ATUALIZAÇÃO DA LOGO: Controle de tela, flexibilidade e imagem */
         .logo {
             display: flex; align-items: center; gap: 10px;
-            text-decoration: none; max-width: 65%; /* Controle para não estourar a tela */
+            text-decoration: none; max-width: 65%; 
             overflow: hidden;
         }
         .logo img {
-            max-height: 45px; max-width: 100%; object-fit: contain; flex-shrink: 0;
+            max-height: 40px; max-width: 100%; object-fit: contain; flex-shrink: 0;
             filter: drop-shadow(0 0 8px rgba(138, 43, 226, 0.4));
         }
         .logo span {
-            font-size: clamp(1.2rem, 3.5vw, 1.8rem); font-weight: 800;
-            background: linear-gradient(135deg, #fff, var(--purple-light));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-size: clamp(1.2rem, 3.5vw, 1.6rem); font-weight: 700; color: #ececec;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px;
         }
         
         .cta-btn {
-            background: linear-gradient(135deg, #000, var(--purple-dark));
-            color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none;
-            font-weight: 600; font-size: 0.95rem; transition: var(--transition-smooth);
-            border: 1px solid var(--purple-neon); box-shadow: 0 4px 20px var(--purple-glow);
-            position: relative; overflow: hidden; z-index: 1; flex-shrink: 0;
+            background: #fff;
+            color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none;
+            font-weight: 500; font-size: 0.95rem; transition: var(--transition-smooth);
+            position: relative; overflow: hidden; z-index: 1; flex-shrink: 0; border: none;
         }
-        .cta-btn::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: all 0.5s; z-index: -1;
-        }
-        .cta-btn:hover::before { left: 100%; transition: all 0.5s; }
         .cta-btn:hover {
-            transform: translateY(-2px) scale(1.02);
-            background: var(--purple-neon);
-            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.6), 0 0 10px rgba(138,43,226,0.8) inset;
+            transform: translateY(-1px);
+            background: #ececec;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
         .hero {
             min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 120px 5% 60px; position: relative;
         }
-        
-        /* ADIÇÃO DE GIF DA INTERNET NO BACKGROUND (Sutil e Profissional) */
-        .hero-gif-bg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100vw; height: 100vh; 
-            background: url('https://media.giphy.com/media/26tn33aiTi1jVDzO0/giphy.gif') center/cover; 
-            opacity: 0.04; z-index: -2; pointer-events: none; mix-blend-mode: screen;
-        }
 
-        .hero-glow {
-            position: absolute; width: 80vw; height: 80vw; max-width: 900px; max-height: 900px;
-            background: radial-gradient(circle, rgba(138,43,226,0.15) 0%, rgba(0,0,0,0) 65%);
-            top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -1; filter: blur(70px);
-        }
         .hero h1 {
-            font-size: clamp(2.5rem, 6.5vw, 5rem); font-weight: 800; line-height: 1.1; margin-bottom: 25px;
-            background: linear-gradient(to right, #ffffff 40%, var(--purple-light) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: clamp(2.5rem, 6.5vw, 4.5rem); font-weight: 700; line-height: 1.1; margin-bottom: 25px;
+            color: #fff;
             opacity: 0; transform: translateY(30px); animation: fadeUp 1s 4.4s forwards;
-            letter-spacing: -2px;
+            letter-spacing: -1.5px; text-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+        .hero h1 span {
+            background: linear-gradient(to right, var(--purple-light) 0%, var(--purple-neon) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .hero p {
-            font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: var(--text-muted); max-width: 800px; margin-bottom: 50px;
-            opacity: 0; transform: translateY(30px); animation: fadeUp 1s 4.6s forwards;
+            font-size: clamp(1.05rem, 2.2vw, 1.25rem); color: var(--text-muted); max-width: 750px; margin-bottom: 50px;
+            opacity: 0; transform: translateY(30px); animation: fadeUp 1s 4.6s forwards; font-weight: 400;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
 
+        /* --- CHATGPT STYLE CONTAINER --- */
         .chat-container {
-            width: 100%; max-width: 900px; background: var(--bg-glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(138,43,226,0.2); border-radius: 16px; padding: clamp(20px, 4vw, 35px);
-            box-shadow: 0 40px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
-            text-align: left; opacity: 0; transform: translateY(30px) scale(0.95);
+            width: 100%; max-width: 850px; background: transparent; 
+            text-align: left; opacity: 0; transform: translateY(30px) scale(0.98);
             animation: scaleUp 1s 4.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            position: relative; overflow: hidden;
+            position: relative; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
         }
+
+        .chat-message { 
+            display: flex; gap: 16px; padding: 30px; font-size: clamp(0.95rem, 1.8vw, 1.05rem); 
+            line-height: 1.6;
+        }
+        .chat-message.user { background-color: var(--bg-chat-user); }
+        .chat-message.ai { background-color: var(--bg-chat-ai); }
         
-        .chat-container::before {
-            content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
-            background: linear-gradient(to bottom, transparent, rgba(138, 43, 226, 0.05), transparent);
-            animation: scanline 6s linear infinite; pointer-events: none;
-        }
-
-        @keyframes scanline { 0% { top: -100%; } 100% { top: 100%; } }
-
-        .chat-message { display: flex; gap: 18px; margin-bottom: 30px; font-size: clamp(0.95rem, 1.8vw, 1.05rem); }
-        .chat-message:last-child { margin-bottom: 0; }
         .avatar {
-            width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.2rem; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);
-            position: relative;
+            width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 1rem; flex-shrink: 0;
         }
-        .avatar.user { background: #111118; color: #fff; }
+        .avatar.user { background: #ab68ff; color: #fff; }
         .avatar.ai { 
-            background: #000; color: var(--purple-light); 
-            box-shadow: 0 0 20px var(--purple-glow); border-color: var(--purple-neon);
-            animation: pulseGlow 2s infinite alternate;
+            background: #fff; color: var(--bg-dark); 
         }
-        @keyframes pulseGlow { to { box-shadow: 0 0 30px rgba(138,43,226,0.8); } }
+        .avatar.ai img {
+            width: 24px; height: 24px; object-fit: contain;
+        }
 
-        .message-content { flex: 1; padding-top: 8px; }
+        .message-content { flex: 1; padding-top: 2px; }
+        .message-header { font-weight: 600; margin-bottom: 8px; color: #fff; font-size: 1rem; }
+        
+        /* CHATGPT STYLE CODE BLOCK */
+        .code-block-wrapper {
+            margin-top: 20px; border-radius: 8px; overflow: hidden;
+            background: #000; border: 1px solid #333;
+        }
+        .code-block-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 16px; background: #2f2f2f; color: #b4b4b4; font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+        }
+        .code-block-header button {
+            background: none; border: none; color: #b4b4b4; cursor: none; display: flex; align-items: center; gap: 5px; font-size: 0.8rem;
+        }
         .code-block {
-            background: #050508; border: 1px solid #1a1a24; border-radius: 8px; padding: 15px; margin-top: 15px;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #c792ea; overflow-x: auto;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative;
+            padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #ececec; overflow-x: auto;
         }
-        .code-block::after {
-            content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%;
-            background: var(--purple-neon); box-shadow: 0 0 10px var(--purple-neon);
-            animation: scanCode 3s ease-in-out infinite alternate; opacity: 0.7;
-        }
-        @keyframes scanCode { 0% { left: 0%; opacity: 0; } 10%, 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        .code-keyword { color: #c792ea; }
+        .code-string { color: #a3be8c; }
+        .code-comment { color: #6272a4; }
 
-        .audience-section { padding: 100px 5%; max-width: 1300px; margin: 0 auto; perspective: 1000px; position: relative; }
+        .audience-section { padding: 100px 5%; max-width: 1200px; margin: 0 auto; perspective: 1000px; position: relative; }
         .section-header { text-align: center; margin-bottom: 70px; position: relative; z-index: 2; }
-        .section-title { font-size: clamp(2.2rem, 4.5vw, 3.2rem); font-weight: 800; color: #fff; margin-bottom: 20px; }
-        .section-title span { color: var(--purple-neon); text-shadow: 0 0 30px var(--purple-glow); }
+        .section-title { font-size: clamp(2.2rem, 4vw, 3rem); font-weight: 700; color: #fff; margin-bottom: 20px; letter-spacing: -1px; }
         .section-desc { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--text-muted); max-width: 700px; margin: 0 auto; }
         
-        .grid-6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; position: relative; z-index: 2; }
+        .grid-6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; position: relative; z-index: 2; }
         
         .feature-card {
-            background: var(--bg-panel); border: var(--border-glass); border-radius: 20px; padding: 40px 30px;
+            background: var(--bg-panel); border: var(--border-glass); border-radius: 12px; padding: 30px;
             transition: transform 0.1s ease-out, box-shadow 0.3s; position: relative; overflow: hidden; 
-            backdrop-filter: blur(10px); transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
         .feature-card::after {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(138, 43, 226, 0.15), transparent 40%);
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.05), transparent 40%);
             opacity: 0; transition: opacity 0.3s; z-index: 1; pointer-events: none;
         }
         .feature-card:hover::after { opacity: 1; }
-        
-        .feature-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--purple-neon), transparent); opacity: 0; transition: 0.5s; z-index: 2;
-        }
-        .feature-card:hover { background: #0a0a0f; box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 20px rgba(138, 43, 226, 0.2); }
-        .feature-card:hover::before { opacity: 1; }
-        
-        .feature-card > * { transform: translateZ(20px); transition: transform 0.3s; position: relative; z-index: 2; }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
         
         .feature-icon {
-            font-size: 2.8rem; color: var(--purple-light); margin-bottom: 20px;
-            text-shadow: 0 0 20px var(--purple-glow);
+            font-size: 2rem; color: var(--purple-light); margin-bottom: 20px;
         }
-        .feature-card h3 { font-size: 1.4rem; color: #fff; margin-bottom: 15px; font-weight: 600; }
-        .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+        .feature-card h3 { font-size: 1.2rem; color: #fff; margin-bottom: 10px; font-weight: 600; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
 
-        .deep-dive { padding: 100px 5%; background: linear-gradient(180deg, var(--bg-dark) 0%, #08080c 50%, var(--bg-dark) 100%); }
+        .deep-dive { padding: 100px 5%; border-top: 1px solid rgba(255,255,255,0.05); background: var(--bg-dark); }
         .deep-dive-container { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 60px; align-items: center; }
         .text-content { flex: 1; min-width: 300px; }
-        .text-content h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 25px; color: #fff; font-weight: 800; }
-        .text-content p { color: var(--text-muted); margin-bottom: 20px; font-size: 1.1rem; }
+        .text-content h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 20px; color: #fff; font-weight: 700; letter-spacing: -1px; }
+        .text-content p { color: var(--text-muted); margin-bottom: 20px; font-size: 1.05rem; }
         .text-content ul { list-style: none; margin-top: 40px; }
         .text-content li { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 25px; color: #fff; transition: transform 0.3s; }
-        .text-content li:hover { transform: translateX(10px); }
-        .text-content li i { color: var(--purple-neon); font-size: 1.8rem; flex-shrink: 0; filter: drop-shadow(0 0 10px var(--purple-neon)); }
+        .text-content li i { color: var(--purple-light); font-size: 1.5rem; flex-shrink: 0; }
         
         .visual-content {
-            flex: 1; min-width: 300px; background: var(--bg-glass); border: var(--border-glass);
-            border-radius: 20px; padding: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative; overflow: hidden;
+            flex: 1; min-width: 300px; background: var(--bg-panel); border: var(--border-glass);
+            border-radius: 12px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); position: relative; overflow: hidden;
         }
 
-        /* ADIÇÃO DE GIF DA INTERNET - Efeito de Rede Neural Integrado */
-        .visual-gif-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; 
-            opacity: 0.15; background: url('https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif') center/cover; 
-            pointer-events: none; mix-blend-mode: screen; filter: grayscale(50%) hue-rotate(250deg);
-        }
-
-        .visual-content > * { position: relative; z-index: 1; }
-
-        footer { background: #010102; padding: 80px 5% 30px; border-top: 1px solid rgba(138, 43, 226, 0.2); margin-top: 50px; }
-        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; max-width: 1300px; margin: 0 auto 50px; }
-        .footer-brand h3 { color: #fff; font-size: 1.5rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        footer { background: #171717; padding: 80px 5% 30px; border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 50px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto 50px; }
+        .footer-brand h3 { color: #fff; font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 600; }
         .footer-brand p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
-        .footer-links h4 { color: #fff; margin-bottom: 25px; font-size: 1.1rem; letter-spacing: 1px; }
+        .footer-links h4 { color: #fff; margin-bottom: 20px; font-size: 1rem; font-weight: 600; }
         .footer-links ul { list-style: none; }
         .footer-links li { margin-bottom: 12px; }
         .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
-        .footer-links a:hover { color: var(--purple-neon); transform: translateX(5px); text-shadow: 0 0 10px var(--purple-glow); }
+        .footer-links a:hover { color: #fff; }
         
         .legal-box {
-            max-width: 1300px; margin: 0 auto; padding: 40px; background: #000;
-            border: 1px solid rgba(138,43,226,0.2); border-radius: 12px; box-shadow: inset 0 0 30px rgba(0,0,0,1);
+            max-width: 1200px; margin: 0 auto; padding: 30px; background: #212121;
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;
             position: relative; overflow: hidden;
         }
-        .legal-box::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: repeating-linear-gradient(transparent, transparent 2px, rgba(138, 43, 226, 0.05) 3px, transparent 4px);
-            pointer-events: none; animation: tvStatic 10s linear infinite; opacity: 0.5;
-        }
-        @keyframes tvStatic { 0% { transform: translateY(0); } 100% { transform: translateY(-50px); } }
 
-        .legal-box p { font-size: 0.75rem; color: #555566; text-align: justify; line-height: 1.8; margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; position: relative; z-index: 2; }
-        .legal-box p:last-child { margin-bottom: 0; text-align: center; margin-top: 30px; color: var(--purple-dark); font-size: 0.85rem; }
+        .legal-box p { font-size: 0.75rem; color: #888; text-align: justify; line-height: 1.6; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+        .legal-box p:last-child { margin-bottom: 0; text-align: center; margin-top: 20px; color: #555; }
 
-        .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleUp { to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -385,13 +362,15 @@
 </head>
 <body>
 
+    <!-- CONTAINER THREE.JS PARA O FUNDO 3D -->
+    <div id="bg-3d-container"></div>
+
     <div class="scroll-progress" id="scrollProgress"></div>
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
     <div class="flash-bang" id="flashBang"></div>
 
-    <!-- ANIMAÇÃO DE ENTRADA ATUALIZADA COM GRID -->
     <div id="intro-overlay">
         <div class="cyber-grid"></div>
         <div class="core-ring r1"></div>
@@ -400,49 +379,57 @@
         <div class="core-text" id="coreText">[ NEURAL.LINK // INITIATED ]</div>
     </div>
 
-    <!-- HEADER ATUALIZADO COM LOGO E CONTROLE DE TELA -->
     <header>
         <a href="https://vppe.cloud" class="logo">
             <img src="https://vppe.cloud/logo.png" alt="VPPE AI Logo">
-            <span><i class="ph-fill ph-cpu" style="color: var(--purple-neon); margin-right: 5px;"></i>VPPE AI</span>
+            <span>VPPE AI</span>
         </a>
-        <a href="https://vppe.cloud" class="cta-btn hover-trigger" target="_blank">Entre ou cadastre-se</a>
+        <a href="https://vppe.cloud" class="cta-btn hover-trigger" target="_blank">Try VPPE AI <i class="ph-bold ph-arrow-up-right"></i></a>
     </header>
 
     <main>
         <section class="hero">
-            <div class="hero-gif-bg"></div>
-            <div class="hero-glow"></div>
-            <h1>Poder Absoluto.<br>Inteligência <span>Artificial.</span></h1>
-            <p>Construída para quem exige domínio técnico. A VPPE AI não apenas responde; ela reescreve a realidade dos seus sistemas corporativos, projetos de código e rotinas diárias com precisão letal.</p>
+            <h1>Otimização.<br>Inteligência <span>Artificial.</span></h1>
+            <p>Construída para quem exige domínio técnico. A VPPE AI não apenas responde; ela otimiza sistemas corporativos, projetos de código e rotinas com precisão de máquina.</p>
             
             <div class="chat-container hover-trigger">
-                <div class="chat-message">
-                    <div class="avatar user"><i class="ph ph-user"></i></div>
+                <!-- User Message -->
+                <div class="chat-message user">
+                    <div class="avatar user">D</div>
                     <div class="message-content">
-                        <strong>Desenvolvedor Sênior:</strong> Injete um protocolo de segurança nível bancário no meu microsserviço Node.js e traduza o impacto disso para o board executivo.
+                        <div class="message-header">You</div>
+                        Injete um protocolo de segurança nível bancário no meu microsserviço Node.js e traduza o impacto disso para o board executivo.
                     </div>
                 </div>
-                <div class="chat-message">
-                    <div class="avatar ai"><i class="ph-fill ph-lightning"></i></div>
-                    <div class="message-content" style="color: var(--text-main);">
-                        <p style="margin-bottom: 15px; color: var(--purple-light); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">> [ROOT_ACCESS] Executando ofuscação e tunelamento criptográfico...</p>
+                <!-- AI Message -->
+                <div class="chat-message ai">
+                    <div class="avatar ai"><img src="https://vppe.cloud/logo.png" alt="AI"></div>
+                    <div class="message-content">
+                        <div class="message-header">VPPE AI</div>
+                        <p><strong>Para os Executivos:</strong> "Acabamos de isolar nossos dados em um cofre digital hermético. Interceptações externas agora são matematicamente quase impossíveis, mitigando drasticamente os riscos de vazamento neste fluxo."</p>
                         
-                        <p><strong>Para os Executivos:</strong> "Acabamos de isolar nossos dados em um cofre digital hermético. Interceptações externas agora são matematicamente impossíveis, eliminando 100% dos riscos de vazamento neste fluxo."</p>
+                        <p style="margin-top: 15px;">Aqui está a implementação do Zero-Trust Protocol para a conexão do seu banco de dados:</p>
                         
-                        <div class="code-block hover-trigger">
-// Node.js Vault Connection (VPPE Zero-Trust Protocol)
-const { Client } = require('pg');
-const client = new Client({
+                        <!-- CHATGPT STYLE CODE BLOCK -->
+                        <div class="code-block-wrapper hover-trigger">
+                            <div class="code-block-header">
+                                <span>javascript</span>
+                                <button><i class="ph ph-copy"></i> Copy code</button>
+                            </div>
+                            <div class="code-block">
+<span class="code-comment">// Node.js Vault Connection (VPPE Zero-Trust Protocol)</span>
+<span class="code-keyword">const</span> { Client } = <span class="code-keyword">require</span>(<span class="code-string">'pg'</span>);
+<span class="code-keyword">const</span> client = <span class="code-keyword">new</span> Client({
     host: process.env.DB_HOST,
     ssl: { 
-        rejectUnauthorized: true, 
+        rejectUnauthorized: <span class="code-keyword">true</span>, 
         ca: process.env.CA_CERT_VAULT,
-        ciphers: 'TLS_AES_256_GCM_SHA384'
+        ciphers: <span class="code-string">'TLS_AES_256_GCM_SHA384'</span>
     }
 });
-await client.connect();
-console.log("[SYSTEM] Conexão blindada estabelecida.");
+<span class="code-keyword">await</span> client.connect();
+console.log(<span class="code-string">"[SYSTEM] Conexão blindada estabelecida."</span>);
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -451,40 +438,40 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
 
         <section class="audience-section">
             <div class="section-header reveal">
-                <h2 class="section-title">Domine seu <span>Ecossistema.</span></h2>
+                <h2 class="section-title">Domine seu Ecossistema.</h2>
                 <p class="section-desc">Adaptabilidade brutal. A VPPE AI mapeia a complexidade do seu ambiente e age como um arquiteto mestre em qualquer disciplina.</p>
             </div>
 
             <div class="grid-6">
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.1s;">
-                    <div class="feature-icon"><i class="ph-fill ph-buildings"></i></div>
+                    <div class="feature-icon"><i class="ph-light ph-buildings"></i></div>
                     <h3>Impérios Corporativos</h3>
-                    <p>Construa APIs impenetráveis. Automatize processos B2B em massa, analise fluxos de caixa em milissegundos e mantenha sigilo corporativo de grau militar.</p>
+                    <p>Construa APIs impenetráveis. Automatize processos B2B em massa, analise fluxos de caixa em milissegundos e mantenha sigilo corporativo.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.2s;">
-                    <div class="feature-icon"><i class="ph-fill ph-terminal"></i></div>
+                    <div class="feature-icon"><i class="ph-light ph-terminal-window"></i></div>
                     <h3>Engenharia de Software</h3>
-                    <p>Código limpo, arquitetura escalável e segurança por padrão. Peça refatorações completas, debug de sistemas legados ou engenharia reversa de lógicas complexas.</p>
+                    <p>Código limpo, arquitetura escalável e segurança por padrão. Peça refatorações completas ou debug de sistemas legados.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.3s;">
-                    <div class="feature-icon"><i class="ph-fill ph-student"></i></div>
+                    <div class="feature-icon"><i class="ph-light ph-student"></i></div>
                     <h3>Estudantes de Elite</h3>
-                    <p>Esmague curvas de aprendizado. Desmembre teorias quânticas, cálculos avançados e filosofias densas em mapas mentais e respostas cirúrgicas.</p>
+                    <p>Esmague curvas de aprendizado. Desmembre teorias quânticas, cálculos avançados e filosofias densas em mapas mentais.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.4s;">
-                    <div class="feature-icon"><i class="ph-fill ph-chalkboard-teacher"></i></div>
+                    <div class="feature-icon"><i class="ph-light ph-chalkboard-teacher"></i></div>
                     <h3>Mestres e Professores</h3>
-                    <p>Automatize a burocracia acadêmica. Gere matrizes de avaliação complexas, planos de aula dinâmicos e foque no que importa: a transferência de conhecimento real.</p>
+                    <p>Automatize a burocracia acadêmica. Gere matrizes de avaliação complexas e planos de aula dinâmicos instantaneamente.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.5s;">
-                    <div class="feature-icon"><i class="ph-fill ph-fingerprint"></i></div>
+                    <div class="feature-icon"><i class="ph-light ph-fingerprint"></i></div>
                     <h3>Rotina Implacável</h3>
-                    <p>Otimização de vida. Transforme a VPPE AI no seu estrategista pessoal. Gestão de finanças, rotinas nutricionais hiper-personalizadas e produtividade máxima.</p>
+                    <p>Otimização de vida. Transforme a IA no seu estrategista. Gestão de finanças e rotinas hiper-personalizadas.</p>
                 </div>
                 <div class="feature-card reveal hover-trigger" style="transition-delay: 0.6s;">
-                    <div class="feature-icon"><i class="ph-fill ph-sword"></i></div>
+                    <div class="feature-icon"><i class="ph-light ph-pen-nib"></i></div>
                     <h3>Criação e Domínio</h3>
-                    <p>Gere textos que convertem, copy persuasiva, roteiros magnéticos e artigos ranqueados para esmagar a concorrência nos motores de busca.</p>
+                    <p>Gere textos que convertem, copy persuasiva, roteiros magnéticos e artigos ranqueados para SEO com maestria.</p>
                 </div>
             </div>
         </section>
@@ -492,37 +479,34 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
         <section class="deep-dive reveal">
             <div class="deep-dive-container">
                 <div class="text-content">
-                    <h2>Força Computacional <span>Bruta.</span></h2>
-                    <p>Nós abandonamos as respostas genéricas. A VPPE AI possui uma base contextual que não apenas gera palavras, mas infere intenções subjacentes, comportando-se como uma mente analítica e implacável.</p>
+                    <h2>Força Computacional Bruta.</h2>
+                    <p>Nós abandonamos as respostas genéricas. A VPPE AI possui uma base contextual que não apenas gera palavras, mas infere intenções subjacentes, comportando-se de forma analítica.</p>
                     
                     <ul>
                         <li class="hover-trigger">
-                            <i class="ph-fill ph-brain"></i>
+                            <i class="ph-light ph-brain"></i>
                             <div>
                                 <strong>Memória de Fio Condutor</strong><br>
-                                <span style="color: var(--text-muted); font-size: 0.95rem;">Lógica persistente. Ela não esquece a arquitetura que você definiu há 20 mensagens atrás.</span>
+                                <span style="color: var(--text-muted); font-size: 0.95rem;">Lógica persistente. Ela retém a arquitetura do contexto fornecido na sessão.</span>
                             </div>
                         </li>
                         <li class="hover-trigger">
-                            <i class="ph-fill ph-lock-key"></i>
+                            <i class="ph-light ph-shield-check"></i>
                             <div>
-                                <strong>Arquitetura Zero-Knowledge</strong><br>
-                                <span style="color: var(--text-muted); font-size: 0.95rem;">O que você processa, morre no túnel de sessão. Nenhum byte é usado no core de treinamento.</span>
+                                <strong>Privacidade por Padrão</strong><br>
+                                <span style="color: var(--text-muted); font-size: 0.95rem;">Controle absoluto. O que você processa no seu ambiente de trabalho permanece privado.</span>
                             </div>
                         </li>
                     </ul>
                 </div>
-                <div class="visual-content hover-trigger" style="transition: transform 0.1s ease-out; transform-style: preserve-3d;">
+                <div class="visual-content hover-trigger" style="transition: transform 0.1s ease-out;">
+                    <h3 style="color: #fff; margin-bottom: 20px; font-weight: 600;"><i class="ph ph-code"></i> Lógica em Ação</h3>
+                    <p style="color: #ececec; margin-bottom: 15px; font-size: 0.95rem;"><strong>Prompt:</strong> "Explique recursividade como se eu estivesse em uma situação de sobrevivência."</p>
                     
-                    <!-- EFEITO GIF DE REDE NEURAL INTEGRADO -->
-                    <div class="visual-gif-overlay"></div>
-
-                    <h3 style="color: var(--purple-light); margin-bottom: 20px; transform: translateZ(30px);"><i class="ph ph-code"></i> Lógica em Ação</h3>
-                    <p style="color: #fff; margin-bottom: 15px; font-size: 0.95rem; transform: translateZ(20px);"><strong>Prompt:</strong> "Explique recursividade como se eu estivesse em uma situação de sobrevivência."</p>
-                    <div style="background: rgba(0,0,0,0.8); padding: 20px; border-radius: 8px; border-left: 3px solid red; color: var(--text-muted); font-size: 0.9rem; transform: translateZ(40px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
-                        <strong style="color: #fff;">Resposta (VPPE AI):</strong><br><br>
-                        Você está perdido numa caverna escura e precisa achar a saída. Você dá um passo. Se for uma parede, você volta (Condição de Parada). Se for caminho livre, você se chama para dar *mais um passo* a partir dali. A recursividade é você delegar a busca para a "sua versão do futuro", que só volta para te avisar quando bater na parede ou achar a luz.<br><br>
-                        <span style="color: #c792ea; font-family: monospace;">def achar_saida(passos):<br>&nbsp;&nbsp;if achou_luz(): return passos<br>&nbsp;&nbsp;if bateu_parede(): return 0<br>&nbsp;&nbsp;return achar_saida(passos + 1)</span>
+                    <div style="background: #212121; padding: 20px; border-radius: 8px; border-left: 3px solid #10a37f; color: var(--text-muted); font-size: 0.9rem;">
+                        <strong style="color: #fff;">VPPE AI</strong><br><br>
+                        Você está perdido numa caverna escura e precisa achar a saída. Você dá um passo. Se for uma parede, você volta (Condição de Parada). Se for caminho livre, você se chama para dar *mais um passo* a partir dali. A recursividade é você delegar a busca para a "sua versão do futuro".<br><br>
+                        <span style="color: #ececec; font-family: monospace;">def achar_saida(passos):<br>&nbsp;&nbsp;if achou_luz(): return passos<br>&nbsp;&nbsp;if bateu_parede(): return 0<br>&nbsp;&nbsp;return achar_saida(passos + 1)</span>
                     </div>
                 </div>
             </div>
@@ -532,35 +516,114 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
-                <h3><img src="https://vppe.cloud/logo.png" style="height: 25px; filter: grayscale(1) brightness(2);"> VPPE AI</h3>
-                <p>Construída nas sombras da tecnologia. A IA definitiva para quem não aceita limitações no ambiente digital.</p>
-                <a href="https://vppe.cloud" class="cta-btn hover-trigger" style="display: inline-block; padding: 8px 16px;">Iniciar Protocolo</a>
+                <h3><img src="https://vppe.cloud/logo.png" style="height: 24px; filter: grayscale(1) brightness(2);"> VPPE AI</h3>
+                <p>A IA definitiva para quem não aceita limitações no ambiente digital. Produtividade levada ao limite.</p>
             </div>
             <div class="footer-links">
                 <h4>Matriz</h4>
                 <ul>
-                    <li><a href="https://vppe.cloud" class="hover-trigger"><i class="ph ph-caret-right"></i> Central de Comando</a></li>
-                    <li><a href="https://vppe.cloud" class="hover-trigger"><i class="ph ph-caret-right"></i> Documentação API</a></li>
-                    <li><a href="https://vppe.cloud" class="hover-trigger"><i class="ph ph-caret-right"></i> Acesso Corporativo</a></li>
+                    <li><a href="https://vppe.cloud" class="hover-trigger">Central de Comando</a></li>
+                    <li><a href="https://vppe.cloud" class="hover-trigger">Documentação API</a></li>
+                    <li><a href="https://vppe.cloud" class="hover-trigger">Acesso Corporativo</a></li>
                 </ul>
             </div>
             <div class="footer-links">
                 <h4>Protocolos Legais</h4>
                 <ul>
-                    <li><a href="#" class="hover-trigger"><i class="ph ph-caret-right"></i> Termos de Uso Restrito</a></li>
-                    <li><a href="#" class="hover-trigger"><i class="ph ph-caret-right"></i> Blindagem de Dados</a></li>
-                    <li><a href="#" class="hover-trigger"><i class="ph ph-caret-right"></i> Conformidade Tática</a></li>
+                    <li><a href="#" class="hover-trigger">Termos de Uso</a></li>
+                    <li><a href="#" class="hover-trigger">Política de Privacidade</a></li>
+                    <li><a href="#" class="hover-trigger">Conformidade</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="legal-box hover-trigger">
-            <p><strong>[ SYSTEM.WARNING ] - PROTOCOLOS DE PROPRIEDADE INTELECTUAL EXTREMA:</strong><br>O ambiente presente opera sob arquitetura fechada. Códigos-fonte, rotinas algorítmicas, layout obscuro (trade dress), shaders e respostas processadas são ativos intransferíveis da VPPE AI e seus licenciadores. Qualquer tentativa de scrape, engenharia reversa de endpoints, clonagem de UI ou uso não autorizado das marcas resultará no rastreamento imediato e na aplicação inclemente das sanções civis, criminais e cibernéticas aplicáveis pelas jurisdições internacionais de Propriedade Industrial e Direitos Autorais. Ao permanecer neste domínio, você submete sua sessão ao monitoramento contínuo de integridade.</p>
-            <p>&copy; 2026 VPPE AI PARTNER (https://vppe.cloud). TODOS OS DIREITOS RESERVADOS. END OF LINE.</p>
+            <p>Os códigos-fonte, rotinas algorítmicas, layout e respostas processadas estão sujeitos aos termos de licenciamento da VPPE AI e seus parceiros. Qualquer tentativa de engenharia reversa de endpoints ou uso não autorizado poderá resultar em medidas cabíveis sob as diretrizes de Propriedade Intelectual.</p>
+            <p>&copy; 2026 VPPE AI PARTNER. TODOS OS DIREITOS RESERVADOS.</p>
         </div>
     </footer>
 
     <script>
+        // ==========================================
+        // 1. SCRIPT DE FUNDO 3D REAL (THREE.JS)
+        // ==========================================
+        const init3DBackground = () => {
+            const container = document.getElementById('bg-3d-container');
+            const scene = new THREE.Scene();
+            
+            // Câmera
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+
+            // Renderizador
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Criando as Partículas (Rede Neural / Espaço)
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 100;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.15,
+                color: 0x8a2be2,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            // Interação suave com o mouse
+            let mouseX = 0;
+            let mouseY = 0;
+            window.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            // Responsividade
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // Loop de Animação
+            const clock = new THREE.Clock();
+            const animate3D = () => {
+                requestAnimationFrame(animate3D);
+                const elapsedTime = clock.getElapsedTime();
+
+                // Rotação suave da malha inteira
+                particlesMesh.rotation.y = elapsedTime * 0.05;
+                particlesMesh.rotation.x = elapsedTime * 0.02;
+
+                // Parallax sutil com o mouse
+                camera.position.x += (mouseX * 5 - camera.position.x) * 0.02;
+                camera.position.y += (mouseY * 5 - camera.position.y) * 0.02;
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+            };
+            animate3D();
+        };
+
+        // Inicia o 3D
+        init3DBackground();
+
+        // ==========================================
+        // 2. SCRIPTS DE INTERAÇÃO EXISTENTES
+        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('intro-overlay');
             const coreText = document.getElementById('coreText');
@@ -577,9 +640,9 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
             }
 
             setTimeout(() => {
-                coreText.style.color = '#ff2a2a';
-                coreText.style.textShadow = '0 0 15px red';
-                coreText.innerText = '[ HYPER.DRIVE // ENGAGED ]';
+                coreText.style.color = '#fff';
+                coreText.style.textShadow = '0 0 15px #fff';
+                coreText.innerText = '[ SYSTEM // ONLINE ]';
             }, 2600);
 
             setTimeout(() => {
@@ -611,7 +674,7 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
                 }, { duration: 150, fill: "forwards" });
             });
 
-            document.querySelectorAll('a, .hover-trigger').forEach(el => {
+            document.querySelectorAll('a, .hover-trigger, button').forEach(el => {
                 el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
                 el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
             });
@@ -633,17 +696,6 @@ console.log("[SYSTEM] Conexão blindada estabelecida.");
 
                     card.style.setProperty('--mouse-x', `${x}px`);
                     card.style.setProperty('--mouse-y', `${y}px`);
-
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -10; 
-                    const rotateY = ((x - centerX) / centerX) * 10;
-                    
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
                 });
             });
         });
